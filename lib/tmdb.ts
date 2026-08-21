@@ -52,3 +52,37 @@ export async function getMovieTrailer(movieId: number) {
   );
   return trailer ? trailer.key : null;
 }
+
+
+// Search movies
+export async function searchMovies(query: string, page: number = 1) {
+  if (!query.trim()) return [];
+  
+  const response = await fetch(
+    `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&page=${page}`
+  );
+  const data = await response.json();
+  return data.results || [];
+}
+
+// Search TV shows (optional)
+export async function searchTVShows(query: string, page: number = 1) {
+  if (!query.trim()) return [];
+  
+  const response = await fetch(
+    `${TMDB_BASE_URL}/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&page=${page}`
+  );
+  const data = await response.json();
+  return data.results || [];
+}
+
+// Multi-search (movies + TV + people)
+export async function multiSearch(query: string, page: number = 1) {
+  if (!query.trim()) return [];
+  
+  const response = await fetch(
+    `${TMDB_BASE_URL}/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&page=${page}`
+  );
+  const data = await response.json();
+  return data.results || [];
+}
