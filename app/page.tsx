@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getPopularMovies, getTrendingMovies, Movie } from '@/lib/tmdb';
+import { getPopularMovies, getTrendingMovies, getTopRatedMovies, getUpcomingMovies, Movie } from '@/lib/tmdb';
 import MovieCard from '@/components/MovieCard';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -10,17 +10,23 @@ export default function Home() {
   const { user, loading } = useAuth();
   const [popularMovies, setPopularMovies] = useState<Movie[]>([]);
   const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
+  const [topRatedMovies, setTopRatedMovies] = useState<Movie[]>([]);
+  const [upcomingMovies, setUpcomingMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadMovies() {
       try {
-        const [popular, trending] = await Promise.all([
+        const [popular, trending, topRated, upcoming] = await Promise.all([
           getPopularMovies(1),
           getTrendingMovies('day'),
+          getTopRatedMovies(),
+          getUpcomingMovies(),
         ]);
         setPopularMovies(popular.slice(0, 10));
         setTrendingMovies(trending.slice(0, 10));
+        setTopRatedMovies(topRated.slice(0, 10));
+        setUpcomingMovies(upcoming.slice(0, 10));
       } catch (error) {
         console.error('Error loading movies:', error);
       } finally {
@@ -87,6 +93,43 @@ export default function Home() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Top Rated Movies */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <h2 className="text-2xl font-serif text-gold mb-6">🌟 Top Rated Movies</h2>
+        {topRatedMovies.length === 0 ? (
+          <p className="text-text-secondary">No top rated movies found.</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {topRatedMovies.map((movie) => (
+              <MovieCard key={movie.id} movie={movie} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Upcoming Movies */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <h2 className="text-2xl font-serif text-gold mb-6">📅 Upcoming Movies</h2>
+        {upcomingMovies.length === 0 ? (
+          <p className="text-text-secondary">No upcoming movies found.</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {upcomingMovies.map((movie) => (
+              <MovieCard key={movie.id} movie={movie} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Load More Button */}
+      <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+        <Link href="/movies">
+          <button className="px-8 py-3 bg-surface-elevated border border-gold/30 text-gold rounded-lg font-semibold hover:bg-gold/10 transition">
+            Browse All Movies →
+          </button>
+        </Link>
       </div>
     </main>
   );
