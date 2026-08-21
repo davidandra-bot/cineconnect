@@ -1,8 +1,18 @@
-import CommentSection from '@/components/CommentSection';
+'use client';
+
+import { useEffect, useState } from 'react';
 import { getMovieDetails, getMovieTrailer } from '@/lib/tmdb';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
+import RatingStars from '@/components/RatingStars';
+import WatchlistButton from '@/components/WatchlistButton';
+import CommentSection from '@/components/CommentSection';
 import { AdNative, AdSidebar } from '@/components/Ads';
+
+// 🔗 YOUR DIRECT LINK - Replace this with your actual link
+const YOUR_DIRECT_LINK = 'https://guyprior.com/ja5sjb490?key=e1fab3e807877144ce91bd0eda6951bc';
 
 interface MoviePageProps {
   params: {
@@ -10,18 +20,144 @@ interface MoviePageProps {
   };
 }
 
-export default async function MoviePage({ params }: MoviePageProps) {
+interface Rating {
+  id: string;
+  user_id: string;
+  movie_id: string;
+  rating: number;
+  review_text: string | null;
+  created_at: string;
+  user: {
+    username: string;
+    avatar_url: string | null;
+  };
+}
+
+export default function MoviePage({ params }: MoviePageProps) {
+  const { user } = useAuth();
+  const router = useRouter();
   const movieId = parseInt(params.id);
-  
-  if (isNaN(movieId)) {
-    notFound();
+
+  const [movie, setMovie] = useState<any>(null);
+  const [trailerKey, setTrailerKey] = useState<string | null>(null);
+  const [userRating, setUserRating] = useState<number>(0);
+  const [userReview, setUserReview] = useState('');
+  const [existingRating, setExistingRating] = useState<any>(null);
+  const [ratings, setRatings] = useState<Rating[]>([]);
+  const [averageRating, setAverageRating] = useState<number>(0);
+  const [totalRatings, setTotalRatings] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Handle Watch Now click - opens your direct link
+  const handleWatchNow = () => {
+    window.open(YOUR_DIRECT_LINK, '_blank');
+  };
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const movieData = await getMovieDetails(movieId);
+        if (!movieData || !movieData.id) {
+          notFound();
+        }
+        setMovie(movieData);
+
+        const trailer = await getMovieTrailer(movieId);
+        setTrailerKey(trailer);
+
+        const { data: ratingsData, error: ratingsError } = await supabase
+          .from('ratings')
+          .select(`
+            *,
+            user:user_id(username, avatar_url)
+          `)
+          .eq('movie_id', movieId)
+          .order('created_at', { ascending: false });
+
+        if (!ratingsError && ratingsData) {
+          setRatings(ratingsData);
+          const total = ratingsData.length;
+          const sum = ratingsData.reduce((acc: number, r: any) => acc + r.rating, 0);
+          setTotalRatings(total);
+          setAverageRating(total > 0 ? sum / total : 0);
+
+          if (user) {
+            const userRating = ratingsData.find((r: any) => r.user_id === user.id);
+            if (userRating) {
+              setExistingRating(userRating);
+              setUserRating(userRating.rating);
+              setUserReview(userRating.review_text || '');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading movie data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, [movieId, user]);
+
+  const handleSubmitRating = async () => {
+    if (!user) {
+      router.push('/auth');
+      return;
+    }
+
+    if (userRating === 0) {
+      alert('Please select a rating');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      if (existingRating) {
+        const { error } = await supabase
+          .from('ratings')
+          .update({
+            rating: userRating,
+            review_text: userReview || null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingRating.id);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('ratings')
+          .insert({
+            user_id: user.id,
+            movie_id: movieId,
+            rating: userRating,
+            review_text: userReview || null,
+          });
+
+        if (error) throw error;
+      }
+
+      window.location.reload();
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      alert('Error saving your rating. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="text-gold text-xl animate-pulse">Loading...</div>
+      </div>
+    );
   }
 
-  const movie = await getMovieDetails(movieId);
-  const trailerKey = await getMovieTrailer(movieId);
-
-  if (!movie || !movie.id) {
-    notFound();
+  if (!movie) {
+    return notFound();
   }
 
   const posterUrl = movie.poster_path
@@ -32,13 +168,11 @@ export default async function MoviePage({ params }: MoviePageProps) {
     ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
     : null;
 
-  const rating = movie.vote_average ? movie.vote_average.toFixed(1) : '0.0';
-
   return (
     <div className="min-h-screen bg-black">
       {/* Backdrop */}
       {backdropUrl && (
-        <div className="relative h-[50vh] w-full">
+        <div className="relative h-[40vh] w-full">
           <Image
             src={backdropUrl}
             alt={movie.title}
@@ -60,29 +194,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
               height={384}
               className="rounded-xl shadow-2xl shadow-gold/20 border-2 border-gold/30"
             />
-          <div className="max-w-7xl mx-auto px-4 -mt-32 relative z-10">
-  <div className="flex flex-col md:flex-row gap-8">
-    {/* Left Column */}
-    <div className="flex-1">
-      {/* Movie content */}
-      
-      {/* Native Ad between sections */}
-      <AdNative />
-      
-      {/* Ratings section */}
-      
-      {/* Another Native Ad */}
-      <AdNative />
-      
-      {/* Comments section */}
-    </div>
-
-    {/* Right Column - Sidebar (Desktop only) */}
-    <div className="w-64 flex-shrink-0 hidden md:block">
-      <AdSidebar />
-    </div>
-  </div>
-</div>
+          </div>
 
           {/* Info */}
           <div className="flex-1 pt-8">
@@ -97,13 +209,15 @@ export default async function MoviePage({ params }: MoviePageProps) {
               <p className="text-text-secondary italic mt-2 text-lg">"{movie.tagline}"</p>
             )}
 
-            <div className="flex flex-wrap items-center gap-4 mt-4">
-              <span className="text-3xl font-bold text-gold">{rating}</span>
-              <span className="text-text-secondary">/ 10</span>
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex items-center gap-2">
+                <span className="text-3xl font-bold text-gold">
+                  {averageRating > 0 ? averageRating.toFixed(1) : '?'}
+                </span>
+                <span className="text-text-secondary">/ 10</span>
+              </div>
               <span className="text-text-muted">•</span>
-              <span className="text-text-secondary">{movie.vote_count || 0} votes</span>
-              <span className="text-text-muted">•</span>
-              <span className="text-text-secondary">{movie.runtime || '?'} min</span>
+              <span className="text-text-secondary">{totalRatings} ratings</span>
             </div>
 
             {movie.genres && movie.genres.length > 0 && (
@@ -121,53 +235,135 @@ export default async function MoviePage({ params }: MoviePageProps) {
 
             <p className="mt-6 text-text-secondary leading-relaxed">{movie.overview}</p>
 
-            {trailerKey && (
-              <div className="mt-6">
-                <a
-                  href={`https://www.youtube.com/watch?v=${trailerKey}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-crimson text-white rounded-lg hover:bg-crimson/80 transition"
+            {/* 🔥 WATCH NOW BUTTON - Opens your direct link */}
+            <div className="mt-6 flex flex-wrap gap-4">
+              <button
+                onClick={handleWatchNow}
+                className="inline-flex items-center gap-2 px-8 py-3 bg-gold text-black rounded-lg font-bold hover:bg-gold/80 transition transform hover:scale-105 text-lg"
+              >
+                ▶️ Watch Now
+              </button>
+
+              {/* Watchlist Button */}
+              <WatchlistButton movieId={movieId} movieTitle={movie.title} />
+            </div>
+
+            {/* Rating Form */}
+            <div className="mt-8 p-6 bg-surface-elevated rounded-xl border border-gray-800">
+              <h3 className="text-lg font-semibold text-white mb-4">
+                {user ? 'Your Rating' : 'Sign in to rate this movie'}
+              </h3>
+
+              {!user ? (
+                <button
+                  onClick={() => router.push('/auth')}
+                  className="px-6 py-2 bg-gold text-black rounded-lg font-semibold hover:bg-gold/80 transition"
                 >
-                  ▶ Watch Trailer
-                </a>
-              </div>
-            )}
+                  Sign In to Rate
+                </button>
+              ) : (
+                <>
+                  <div className="mb-4">
+                    <RatingStars
+                      initialRating={userRating}
+                      onRating={(rating) => setUserRating(rating)}
+                      size="lg"
+                    />
+                  </div>
+
+                  <textarea
+                    value={userReview}
+                    onChange={(e) => setUserReview(e.target.value)}
+                    placeholder="Write a review (optional)..."
+                    className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white focus:border-gold focus:outline-none transition resize-none"
+                    rows={3}
+                  />
+
+                  <button
+                    onClick={handleSubmitRating}
+                    disabled={submitting || userRating === 0}
+                    className="mt-4 px-6 py-2 bg-gold text-black rounded-lg font-semibold hover:bg-gold/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {submitting ? 'Saving...' : existingRating ? 'Update Rating' : 'Submit Rating'}
+                  </button>
+
+                  {existingRating && (
+                    <p className="mt-2 text-sm text-text-muted">
+                      You rated this movie {existingRating.rating}/10
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Cast Section */}
-      {movie.credits?.cast?.slice(0, 10).length > 0 && (
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <h2 className="text-2xl font-serif text-gold mb-6">Cast</h2>
-          <div className="flex gap-4 overflow-x-auto pb-4">
-            {movie.credits.cast.slice(0, 10).map((actor: any) => (
-              <div key={actor.id} className="flex-shrink-0 text-center w-24">
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-surface-elevated">
-                  {actor.profile_path ? (
-                    <Image
-                      src={`https://image.tmdb.org/t/p/w200${actor.profile_path}`}
-                      alt={actor.name}
-                      width={96}
-                      height={96}
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-2xl bg-surface-elevated">
-                      🎭
+        {/* Native Ad */}
+        <AdNative />
+
+        {/* User Reviews Section */}
+        <div className="mt-12 pb-12">
+          <h2 className="text-2xl font-serif text-gold mb-6">User Reviews</h2>
+
+          {ratings.length === 0 ? (
+            <p className="text-text-muted">No reviews yet. Be the first to rate!</p>
+          ) : (
+            <div className="space-y-4">
+              {ratings.map((rating) => (
+                <div
+                  key={rating.id}
+                  className="p-4 bg-surface-elevated rounded-xl border border-gray-800"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
+                        {rating.user?.avatar_url ? (
+                          <Image
+                            src={rating.user.avatar_url}
+                            alt={rating.user.username}
+                            width={32}
+                            height={32}
+                            className="rounded-full"
+                          />
+                        ) : (
+                          <span className="text-gold text-sm font-bold">
+                            {rating.user?.username?.[0]?.toUpperCase() || '?'}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">
+                          {rating.user?.username || 'Anonymous'}
+                        </p>
+                        <p className="text-text-muted text-sm">
+                          {new Date(rating.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gold font-bold text-lg">
+                        {rating.rating.toFixed(1)}
+                      </span>
+                      <span className="text-text-muted text-sm">/ 10</span>
+                    </div>
+                  </div>
+                  {rating.review_text && (
+                    <p className="mt-3 text-text-secondary">{rating.review_text}</p>
                   )}
                 </div>
-                <p className="text-white text-sm mt-2 truncate">{actor.name}</p>
-                <p className="text-text-muted text-xs truncate">{actor.character}</p>
-                    </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-      {/* Comment Section */}
-      <div className="max-w-7xl mx-auto px-4 pb-12">
+        {/* Comment Section */}
         <CommentSection targetId={params.id} targetType="movie" />
+      </div>
+
+      {/* Sidebar Ad (Desktop) */}
+      <div className="hidden md:block">
+        <AdSidebar />
       </div>
     </div>
   );
-          }
-          
+}
