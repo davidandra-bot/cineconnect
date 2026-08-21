@@ -46,24 +46,27 @@ function Navbar() {
           {/* User Menu */}
           <div className="flex items-center gap-4">
             {user ? (
-              <>
-                <Link href="/watchlist" className="text-text-secondary hover:text-white transition relative md:hidden">
-                  📋
-                </Link>
-                <button
-                  onClick={signOut}
-                  className="px-4 py-2 bg-crimson/20 text-crimson rounded-full hover:bg-crimson/30 transition text-sm font-medium"
-                >
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              <Link href="/auth">
-                <button className="px-4 py-2 bg-gold text-black rounded-full hover:bg-gold/80 transition text-sm font-medium">
-                  Sign In
-                </button>
-              </Link>
-            )}
+  <>
+    <Link href="/profile" className="text-text-secondary hover:text-white transition">
+      👤 Profile
+    </Link>
+    <Link href="/watchlist" className="text-text-secondary hover:text-white transition relative md:hidden">
+      📋
+    </Link>
+    <button
+      onClick={signOut}
+      className="px-4 py-2 bg-crimson/20 text-crimson rounded-full hover:bg-crimson/30 transition text-sm font-medium"
+    >
+      Sign Out
+    </button>
+  </>
+) : (
+  <Link href="/auth">
+    <button className="px-4 py-2 bg-gold text-black rounded-full hover:bg-gold/80 transition text-sm font-medium">
+      Sign In
+    </button>
+  </Link>
+)}
           </div>
         </div>
       </div>
