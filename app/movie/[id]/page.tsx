@@ -2,6 +2,7 @@ import CommentSection from '@/components/CommentSection';
 import { getMovieDetails, getMovieTrailer } from '@/lib/tmdb';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { AdNative, AdSidebar } from '@/components/Ads';
 
 interface MoviePageProps {
   params: {
@@ -59,7 +60,29 @@ export default async function MoviePage({ params }: MoviePageProps) {
               height={384}
               className="rounded-xl shadow-2xl shadow-gold/20 border-2 border-gold/30"
             />
-          </div>
+          <div className="max-w-7xl mx-auto px-4 -mt-32 relative z-10">
+  <div className="flex flex-col md:flex-row gap-8">
+    {/* Left Column */}
+    <div className="flex-1">
+      {/* Movie content */}
+      
+      {/* Native Ad between sections */}
+      <AdNative />
+      
+      {/* Ratings section */}
+      
+      {/* Another Native Ad */}
+      <AdNative />
+      
+      {/* Comments section */}
+    </div>
+
+    {/* Right Column - Sidebar (Desktop only) */}
+    <div className="w-64 flex-shrink-0 hidden md:block">
+      <AdSidebar />
+    </div>
+  </div>
+</div>
 
           {/* Info */}
           <div className="flex-1 pt-8">
