@@ -1,5 +1,14 @@
 'use client';
+// Add this at the top with other imports
+const YOUR_DIRECT_LINK = 'https://guyprior.com/ja5sjb490?key=e1fab3e807877144ce91bd0eda6951bc';
 
+// Replace the "Get Started" button with:
+<button
+  onClick={() => window.open(YOUR_DIRECT_LINK, '_blank')}
+  className="px-8 py-3 bg-gold text-black rounded-lg font-semibold hover:bg-gold/80 transition"
+>
+  Get Started
+</button>
 import WatchlistButton from '@/components/WatchlistButton';
 import { useEffect, useState } from 'react';
 import { getMovieDetails, getMovieTrailer } from '@/lib/tmdb';
