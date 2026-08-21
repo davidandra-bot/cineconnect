@@ -4,6 +4,27 @@ import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { AdPopunder, AdSocial, AdBanner } from '@/components/Ads';
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className="dark">
+      <body className={`${inter.className} bg-black text-white antialiased`}>
+        <AuthProvider>
+          <AdPopunder />          {/* Popunder ads */}
+          <AdBanner />            {/* Banner ad at top */}
+          <Navbar />
+          <main className="pb-20">{children}</main>  {/* Space for social bar */}
+          <AdSocial />            {/* Sticky bottom ad */}
+        </AuthProvider>
+      </body>
+    </html>
+  );
+          }
 
 const inter = Inter({ subsets: ['latin'] });
 
