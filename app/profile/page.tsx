@@ -7,6 +7,9 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
+// 🔗 YOUR DIRECT LINK
+const YOUR_DIRECT_LINK = 'https://guyprior.com/ja5sjb490?key=e1fab3e807877144ce91bd0eda6951bc';
+
 interface ProfileData {
   id: string;
   username: string;
@@ -52,6 +55,12 @@ export default function ProfilePage() {
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const handleWatchNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(YOUR_DIRECT_LINK, '_blank');
+  };
+
   useEffect(() => {
     if (!loading && !user) {
       router.push('/auth');
@@ -66,7 +75,6 @@ export default function ProfilePage() {
   const loadProfileData = async () => {
     setIsLoading(true);
     try {
-      // Get user profile
       const { data: profileData, error: profileError } = await supabase
         .from('users')
         .select('*')
@@ -76,7 +84,6 @@ export default function ProfilePage() {
       if (profileError) throw profileError;
       setProfile(profileData);
 
-      // Get user's ratings
       const { data: ratingsData, error: ratingsError } = await supabase
         .from('ratings')
         .select(`
@@ -99,7 +106,6 @@ export default function ProfilePage() {
         setRatings(ratingsData);
       }
 
-      // Get user's watchlist
       const { data: watchlistData, error: watchlistError } = await supabase
         .from('watchlist')
         .select(`
@@ -116,10 +122,8 @@ export default function ProfilePage() {
         .order('added_at', { ascending: false })
         .limit(10);
 
-      // Build activity feed
       const activities: Activity[] = [];
 
-      // Add rating activities
       ratingsData?.forEach((r: any) => {
         activities.push({
           id: r.id,
@@ -130,7 +134,6 @@ export default function ProfilePage() {
         });
       });
 
-      // Add watchlist activities
       watchlistData?.forEach((w: any) => {
         activities.push({
           id: w.id,
@@ -141,7 +144,6 @@ export default function ProfilePage() {
         });
       });
 
-      // Sort by date (newest first)
       activities.sort((a, b) => 
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
@@ -176,7 +178,6 @@ export default function ProfilePage() {
         {/* Profile Header */}
         <div className="bg-surface-elevated rounded-xl border border-gray-800 p-8 mb-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
-            {/* Avatar */}
             <div className="w-24 h-24 rounded-full bg-gold/20 flex items-center justify-center flex-shrink-0">
               {profile.avatar_url ? (
                 <Image
@@ -193,7 +194,6 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {/* Info */}
             <div className="text-center md:text-left flex-1">
               <h1 className="text-3xl font-serif text-gold">
                 {profile.display_name || profile.username}
@@ -207,7 +207,6 @@ export default function ProfilePage() {
               </p>
             </div>
 
-            {/* Stats */}
             <div className="flex gap-6 text-center">
               <div>
                 <p className="text-xl font-bold text-gold">{ratings.length}</p>
@@ -235,7 +234,7 @@ export default function ProfilePage() {
               {activities.map((activity) => (
                 <div
                   key={activity.id}
-                  className="p-4 bg-surface-elevated rounded-xl border border-gray-800"
+                  className="p-4 bg-surface-elevated rounded-xl border border-gray-800 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
                     {activity.type === 'rated' && (
@@ -262,6 +261,13 @@ export default function ProfilePage() {
                       {new Date(activity.created_at).toLocaleDateString()}
                     </span>
                   </div>
+                  {/* Watch Now button on activities */}
+                  <button
+                    onClick={handleWatchNow}
+                    className="px-3 py-1 bg-gold/20 text-gold text-xs rounded-full hover:bg-gold/40 transition font-medium flex-shrink-0"
+                  >
+                    ▶️ Watch
+                  </button>
                 </div>
               ))}
             </div>
@@ -291,8 +297,8 @@ export default function ProfilePage() {
                           </div>
                         )}
                       </div>
-                      <div className="flex-1">
-                        <h3 className="text-white font-medium">{rating.movie.title}</h3>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-white font-medium truncate">{rating.movie.title}</h3>
                         <div className="flex items-center gap-2">
                           <span className="text-gold font-bold">{rating.rating}/10</span>
                           <span className="text-text-muted text-sm">
@@ -305,6 +311,13 @@ export default function ProfilePage() {
                           </p>
                         )}
                       </div>
+                      {/* Watch Now button on reviews */}
+                      <button
+                        onClick={handleWatchNow}
+                        className="flex-shrink-0 px-3 py-1 bg-gold/20 text-gold text-xs rounded-full hover:bg-gold/40 transition font-medium"
+                      >
+                        ▶️ Watch
+                      </button>
                     </div>
                   </div>
                 </Link>
