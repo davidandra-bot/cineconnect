@@ -1,5 +1,6 @@
 'use client';
 
+import WatchlistButton from '@/components/WatchlistButton';
 import { useEffect, useState } from 'react';
 import { getMovieDetails, getMovieTrailer } from '@/lib/tmdb';
 import Image from 'next/image';
@@ -283,19 +284,22 @@ export default function MoviePage({ params }: MoviePageProps) {
             </div>
 
             {trailerKey && (
-              <div className="mt-6">
-                <a
-                  href={`https://www.youtube.com/watch?v=${trailerKey}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-crimson text-white rounded-lg hover:bg-crimson/80 transition"
-                >
-                  ▶ Watch Trailer
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
+        <div className="mt-6">
+    <a
+      href={`https://www.youtube.com/watch?v=${trailerKey}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 px-6 py-3 bg-crimson text-white rounded-lg hover:bg-crimson/80 transition"
+    >
+      ▶ Watch Trailer
+    </a>
+  </div>
+)}
+
+{/* Add Watchlist Button */}
+<div className="mt-4">
+  <WatchlistButton movieId={movieId} movieTitle={movie.title} />
+</div>
 
         {/* User Reviews Section */}
         <div className="mt-12 pb-12">
