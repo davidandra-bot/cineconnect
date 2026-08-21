@@ -86,16 +86,22 @@ function Navbar() {
           <span className="text-xs">Watchlist</span>
         </Link>
         {user ? (
-          <button onClick={signOut} className="flex flex-col items-center text-text-muted hover:text-white transition">
-            <span className="text-lg">🚪</span>
-            <span className="text-xs">Logout</span>
-          </button>
-        ) : (
-          <Link href="/auth" className="flex flex-col items-center text-text-muted hover:text-white transition">
-            <span className="text-lg">🔑</span>
-            <span className="text-xs">Login</span>
-          </Link>
-        )}
+  <>
+    <Link href="/profile" className="flex flex-col items-center text-text-muted hover:text-white transition">
+      <span className="text-lg">👤</span>
+      <span className="text-xs">Profile</span>
+    </Link>
+    <button onClick={signOut} className="flex flex-col items-center text-text-muted hover:text-white transition">
+      <span className="text-lg">🚪</span>
+      <span className="text-xs">Logout</span>
+    </button>
+  </>
+) : (
+  <Link href="/auth" className="flex flex-col items-center text-text-muted hover:text-white transition">
+    <span className="text-lg">🔑</span>
+    <span className="text-xs">Login</span>
+  </Link>
+)}
       </div>
     </nav>
   );
