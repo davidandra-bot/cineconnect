@@ -1,3 +1,4 @@
+import CommentSection from '@/components/CommentSection';
 import { getMovieDetails, getMovieTrailer } from '@/lib/tmdb';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -137,11 +138,13 @@ export default async function MoviePage({ params }: MoviePageProps) {
                 </div>
                 <p className="text-white text-sm mt-2 truncate">{actor.name}</p>
                 <p className="text-text-muted text-xs truncate">{actor.character}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+                    </div>
+
+      {/* Comment Section */}
+      <div className="max-w-7xl mx-auto px-4 pb-12">
+        <CommentSection targetId={params.id} targetType="movie" />
+      </div>
     </div>
   );
-}
+          }
+          
