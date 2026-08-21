@@ -1,45 +1,91 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { getPopularMovies, getTrendingMovies, Movie } from '@/lib/tmdb';
+import MovieCard from '@/components/MovieCard';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 
 export default function Home() {
   const { user, loading } = useAuth();
+  const [popularMovies, setPopularMovies] = useState<Movie[]>([]);
+  const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (loading) {
+  useEffect(() => {
+    async function loadMovies() {
+      try {
+        const [popular, trending] = await Promise.all([
+          getPopularMovies(1),
+          getTrendingMovies('day'),
+        ]);
+        setPopularMovies(popular.slice(0, 10));
+        setTrendingMovies(trending.slice(0, 10));
+      } catch (error) {
+        console.error('Error loading movies:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadMovies();
+  }, []);
+
+  if (loading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="text-gold text-xl">Loading...</div>
+        <div className="text-gold text-xl animate-pulse">Loading movies...</div>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-black px-4">
-      <div className="text-center">
-        <h1 className="text-4xl md:text-6xl font-serif text-gold mb-4 gold-glow">
-          CineConnect
-        </h1>
-        <p className="text-xl text-text-secondary mb-8">
-          Welcome to the social universe of cinema! 🎬
-        </p>
+    <main className="min-h-screen bg-black">
+      {/* Hero Section */}
+      <div className="relative h-[50vh] flex items-center justify-center bg-gradient-to-b from-surface-elevated to-black">
+        <div className="text-center px-4">
+          <h1 className="text-4xl md:text-6xl font-serif text-gold gold-glow mb-4">
+            CineConnect
+          </h1>
+          <p className="text-xl text-text-secondary mb-8">
+            Discover, rate, and share movies with friends 🎬
+          </p>
+          {!user ? (
+            <Link href="/auth">
+              <button className="px-8 py-3 bg-gold text-black rounded-lg font-semibold hover:bg-gold/80 transition">
+                Get Started
+              </button>
+            </Link>
+          ) : (
+            <p className="text-white">Welcome back! 🎉</p>
+          )}
+        </div>
+      </div>
 
-        {user ? (
-          <div>
-            <p className="text-white mb-4">Hello, {user.email}!</p>
-            <button
-              onClick={() => supabase.auth.signOut()}
-              className="px-6 py-3 bg-crimson text-white rounded-lg hover:bg-crimson/80 transition"
-            >
-              Sign Out
-            </button>
-          </div>
+      {/* Trending Movies */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <h2 className="text-2xl font-serif text-gold mb-6">🔥 Trending Today</h2>
+        {trendingMovies.length === 0 ? (
+          <p className="text-text-secondary">No trending movies found. Check your TMDB API key.</p>
         ) : (
-          <Link href="/auth">
-            <button className="px-8 py-3 bg-gold text-black rounded-lg font-semibold hover:bg-gold/80 transition">
-              Get Started
-            </button>
-          </Link>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {trendingMovies.map((movie) => (
+              <MovieCard key={movie.id} movie={movie} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Popular Movies */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <h2 className="text-2xl font-serif text-gold mb-6">⭐ Popular Movies</h2>
+        {popularMovies.length === 0 ? (
+          <p className="text-text-secondary">No popular movies found. Check your TMDB API key.</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {popularMovies.map((movie) => (
+              <MovieCard key={movie.id} movie={movie} />
+            ))}
+          </div>
         )}
       </div>
     </main>
