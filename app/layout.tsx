@@ -6,26 +6,6 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { AdPopunder, AdSocial, AdBanner } from '@/components/Ads';
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en" className="dark">
-      <body className={`${inter.className} bg-black text-white antialiased`}>
-        <AuthProvider>
-          <AdPopunder />          {/* Popunder ads */}
-          <AdBanner />            {/* Banner ad at top */}
-          <Navbar />
-          <main className="pb-20">{children}</main>  {/* Space for social bar */}
-          <AdSocial />            {/* Sticky bottom ad */}
-        </AuthProvider>
-      </body>
-    </html>
-  );
-          }
-
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -67,61 +47,61 @@ function Navbar() {
           {/* User Menu */}
           <div className="flex items-center gap-4">
             {user ? (
-  <>
-    <Link href="/profile" className="text-text-secondary hover:text-white transition">
-      👤 Profile
-    </Link>
-    <Link href="/watchlist" className="text-text-secondary hover:text-white transition relative md:hidden">
-      📋
-    </Link>
-    <button
-      onClick={signOut}
-      className="px-4 py-2 bg-crimson/20 text-crimson rounded-full hover:bg-crimson/30 transition text-sm font-medium"
-    >
-      Sign Out
-    </button>
-  </>
-) : (
-  <Link href="/auth">
-    <button className="px-4 py-2 bg-gold text-black rounded-full hover:bg-gold/80 transition text-sm font-medium">
-      Sign In
-    </button>
-  </Link>
-)}
+              <>
+                <Link href="/profile" className="text-text-secondary hover:text-white transition">
+                  👤 Profile
+                </Link>
+                <Link href="/watchlist" className="text-text-secondary hover:text-white transition relative md:hidden">
+                  📋
+                </Link>
+                <button
+                  onClick={signOut}
+                  className="px-4 py-2 bg-crimson/20 text-crimson rounded-full hover:bg-crimson/30 transition text-sm font-medium"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <Link href="/auth">
+                <button className="px-4 py-2 bg-gold text-black rounded-full hover:bg-gold/80 transition text-sm font-medium">
+                  Sign In
+                </button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
 
       {/* Mobile Bottom Navigation */}
-<div className="md:hidden flex items-center justify-around py-2 border-t border-gray-800/50 bg-black/95 backdrop-blur">
-  <Link href="/" className="flex flex-col items-center text-text-muted hover:text-white transition">
-    <span className="text-lg">🏠</span>
-    <span className="text-xs">Home</span>
-  </Link>
-  <Link href="/search" className="flex flex-col items-center text-text-muted hover:text-white transition">
-    <span className="text-lg">🔍</span>
-    <span className="text-xs">Search</span>
-  </Link>
-  <Link href="/movies" className="flex flex-col items-center text-text-muted hover:text-white transition">
-    <span className="text-lg">🎬</span>
-    <span className="text-xs">Movies</span>
-  </Link>
-  <Link href="/watchlist" className="flex flex-col items-center text-text-muted hover:text-white transition">
-    <span className="text-lg">📋</span>
-    <span className="text-xs">Watchlist</span>
-  </Link>
-  {user ? (
-    <Link href="/profile" className="flex flex-col items-center text-text-muted hover:text-white transition">
-      <span className="text-lg">👤</span>
-      <span className="text-xs">Profile</span>
-    </Link>
-  ) : (
-    <Link href="/auth" className="flex flex-col items-center text-text-muted hover:text-white transition">
-      <span className="text-lg">🔑</span>
-      <span className="text-xs">Login</span>
-    </Link>
-  )}
-</div>
+      <div className="md:hidden flex items-center justify-around py-2 border-t border-gray-800/50 bg-black/95 backdrop-blur">
+        <Link href="/" className="flex flex-col items-center text-text-muted hover:text-white transition">
+          <span className="text-lg">🏠</span>
+          <span className="text-xs">Home</span>
+        </Link>
+        <Link href="/search" className="flex flex-col items-center text-text-muted hover:text-white transition">
+          <span className="text-lg">🔍</span>
+          <span className="text-xs">Search</span>
+        </Link>
+        <Link href="/movies" className="flex flex-col items-center text-text-muted hover:text-white transition">
+          <span className="text-lg">🎬</span>
+          <span className="text-xs">Movies</span>
+        </Link>
+        <Link href="/watchlist" className="flex flex-col items-center text-text-muted hover:text-white transition">
+          <span className="text-lg">📋</span>
+          <span className="text-xs">Watchlist</span>
+        </Link>
+        {user ? (
+          <Link href="/profile" className="flex flex-col items-center text-text-muted hover:text-white transition">
+            <span className="text-lg">👤</span>
+            <span className="text-xs">Profile</span>
+          </Link>
+        ) : (
+          <Link href="/auth" className="flex flex-col items-center text-text-muted hover:text-white transition">
+            <span className="text-lg">🔑</span>
+            <span className="text-xs">Login</span>
+          </Link>
+        )}
+      </div>
     </nav>
   );
 }
@@ -135,8 +115,11 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-black text-white antialiased`}>
         <AuthProvider>
+          <AdPopunder />          {/* Popunder ads */}
+          <AdBanner />            {/* Banner ad at top */}
           <Navbar />
-          <main>{children}</main>
+          <main className="pb-20">{children}</main>  {/* Space for social bar */}
+          <AdSocial />            {/* Sticky bottom ad */}
         </AuthProvider>
       </body>
     </html>
