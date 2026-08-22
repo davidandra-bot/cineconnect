@@ -90,9 +90,7 @@ export default function WatchlistPage() {
   const handleWatchNow = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    window.open(https://guyprior.com/fctiqbvz?key=1bd7c2f1459a5440009f923df1013ec9, '_blank');
-  };
-
+    window.open('https://guyprior.com/fctiqbvz?key=1bd7c2f1459a5440009f923df1013ec9', '_blank');
   if (loading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
