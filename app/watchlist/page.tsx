@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
-// 🔗 YOUR DIRECT LINK - Replace with your actual link
 const YOUR_DIRECT_LINK = 'https://guyprior.com/ja5sjb490?key=e1fab3e807877144ce91bd0eda6951bc';
 
 interface WatchlistItem {
@@ -37,11 +36,11 @@ export default function WatchlistPage() {
     }
 
     if (user) {
-      loadWatchlist(user.id);
+      loadWatchlist();
     }
   }, [user, loading]);
 
-  const loadWatchlist = async (userId: string) => {
+  const loadWatchlist = async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -59,18 +58,11 @@ export default function WatchlistPage() {
             vote_average
           )
         `)
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .order('added_at', { ascending: false });
 
       if (error) throw error;
-      
-      // Handle Supabase nested array response
-      const typedWatchlist = (data as any[] || []).map(item => ({
-        ...item,
-        movies: Array.isArray(item.movies) ? item.movies[0] : item.movies
-      }));
-      
-      setWatchlist(typedWatchlist);
+      setWatchlist(data || []);
     } catch (error) {
       console.error('Error loading watchlist:', error);
     } finally {
@@ -147,7 +139,6 @@ export default function WatchlistPage() {
                           sizes="(max-width: 768px) 50vw, 33vw"
                         />
                         
-                        {/* Remove button */}
                         <button
                           onClick={(e) => {
                             e.preventDefault();
@@ -158,7 +149,6 @@ export default function WatchlistPage() {
                           ❌
                         </button>
 
-                        {/* Watch Now button overlay on hover */}
                         <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 p-4">
                           <button
                             onClick={handleWatchNow}
@@ -184,7 +174,6 @@ export default function WatchlistPage() {
                               )}
                             </div>
                           </div>
-                          {/* Small Watch button */}
                           <button
                             onClick={handleWatchNow}
                             className="flex-shrink-0 px-3 py-1 bg-gold/20 text-gold text-xs rounded-full hover:bg-gold/40 transition font-medium"
