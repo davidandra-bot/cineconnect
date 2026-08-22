@@ -90,7 +90,6 @@ export default function CommentSection({ targetId, targetType }: CommentSectionP
 
       if (error) throw error;
 
-      // Add user info to comment
       const commentWithUser = {
         ...data,
         user: {
@@ -117,13 +116,11 @@ export default function CommentSection({ targetId, targetType }: CommentSectionP
     }
 
     try {
-      // Check if user already reacted
       const existingReaction = comments
         .find(c => c.id === commentId)
         ?.reactions?.find(r => r.user_id === user.id);
 
       if (existingReaction) {
-        // Remove reaction
         const { error } = await supabase
           .from('reactions')
           .delete()
@@ -131,7 +128,6 @@ export default function CommentSection({ targetId, targetType }: CommentSectionP
 
         if (error) throw error;
       } else {
-        // Add reaction
         const { error } = await supabase
           .from('reactions')
           .insert({
@@ -144,7 +140,6 @@ export default function CommentSection({ targetId, targetType }: CommentSectionP
         if (error) throw error;
       }
 
-      // Reload comments to update reactions
       await loadComments();
     } catch (error) {
       console.error('Error updating reaction:', error);
@@ -161,7 +156,6 @@ export default function CommentSection({ targetId, targetType }: CommentSectionP
     <div className="mt-8">
       <h3 className="text-2xl font-serif text-gold mb-6">💬 Discussion</h3>
 
-      {/* Comment Form */}
       <form onSubmit={handleSubmit} className="mb-8">
         <div className="flex gap-3">
           <div className="flex-1">
@@ -196,7 +190,6 @@ export default function CommentSection({ targetId, targetType }: CommentSectionP
         )}
       </form>
 
-      {/* Comments List */}
       {comments.length === 0 ? (
         <p className="text-text-muted text-center py-8">
           No comments yet. Be the first to share your thoughts!
@@ -209,7 +202,6 @@ export default function CommentSection({ targetId, targetType }: CommentSectionP
               className="p-4 bg-surface-elevated rounded-xl border border-gray-800"
             >
               <div className="flex items-start gap-3">
-                {/* Avatar */}
                 <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center flex-shrink-0">
                   {comment.user?.avatar_url ? (
                     <Image
@@ -237,7 +229,6 @@ export default function CommentSection({ targetId, targetType }: CommentSectionP
                   </div>
                   <p className="text-text-secondary mt-1">{comment.content}</p>
 
-                  {/* Reactions */}
                   <div className="flex items-center gap-4 mt-2">
                     <button
                       onClick={() => handleReaction(comment.id, 'like')}
