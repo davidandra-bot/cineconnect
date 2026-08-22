@@ -63,7 +63,14 @@ export default function WatchlistPage() {
         .order('added_at', { ascending: false });
 
       if (error) throw error;
-      setWatchlist(data || []);
+      
+      // Handle Supabase nested array response
+      const typedWatchlist = (data as any[] || []).map(item => ({
+        ...item,
+        movies: Array.isArray(item.movies) ? item.movies[0] : item.movies
+      }));
+      
+      setWatchlist(typedWatchlist);
     } catch (error) {
       console.error('Error loading watchlist:', error);
     } finally {
