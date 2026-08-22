@@ -45,7 +45,6 @@ export default function WatchlistButton({ movieId, movieTitle }: WatchlistButton
 
     try {
       if (inWatchlist) {
-        // Remove from watchlist
         const { error } = await supabase
           .from('watchlist')
           .delete()
@@ -55,7 +54,6 @@ export default function WatchlistButton({ movieId, movieTitle }: WatchlistButton
         if (error) throw error;
         setInWatchlist(false);
       } else {
-        // Add to watchlist
         const { error } = await supabase
           .from('watchlist')
           .insert({
