@@ -73,7 +73,6 @@ export default function SearchBar() {
         )}
       </form>
 
-      {/* Search Results Dropdown */}
       {isOpen && results.length > 0 && (
         <div className="absolute top-full mt-2 w-full bg-surface-elevated border border-gray-700 rounded-lg shadow-2xl max-h-96 overflow-y-auto z-50">
           {results.map((movie) => {
