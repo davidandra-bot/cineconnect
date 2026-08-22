@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
-// 🔗 YOUR DIRECT LINK
 const YOUR_DIRECT_LINK = 'https://guyprior.com/ja5sjb490?key=e1fab3e807877144ce91bd0eda6951bc';
 
 interface ProfileData {
@@ -68,17 +67,17 @@ export default function ProfilePage() {
     }
 
     if (user) {
-      loadProfileData(user.id);
+      loadProfileData();
     }
   }, [user, loading]);
 
-  const loadProfileData = async (userId: string) => {
+  const loadProfileData = async () => {
     setIsLoading(true);
     try {
       const { data: profileData, error: profileError } = await supabase
         .from('users')
         .select('*')
-        .eq('id', userId)
+        .eq('id', user.id)
         .single();
 
       if (profileError) throw profileError;
@@ -98,17 +97,12 @@ export default function ProfilePage() {
             release_date
           )
         `)
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(10);
 
       if (!ratingsError && ratingsData) {
-        // Cast to the correct type since Supabase returns a nested array
-        const typedRatings = (ratingsData as any[]).map(r => ({
-          ...r,
-          movie: Array.isArray(r.movie) ? r.movie[0] : r.movie
-        }));
-        setRatings(typedRatings);
+        setRatings(ratingsData);
       }
 
       const { data: watchlistData, error: watchlistError } = await supabase
@@ -123,31 +117,29 @@ export default function ProfilePage() {
             poster_path
           )
         `)
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .order('added_at', { ascending: false })
         .limit(10);
 
       const activities: Activity[] = [];
 
       ratingsData?.forEach((r: any) => {
-        const movie = Array.isArray(r.movie) ? r.movie[0] : r.movie;
         activities.push({
           id: r.id,
           type: 'rated',
           data: { rating: r.rating },
           created_at: r.created_at,
-          movie: movie,
+          movie: r.movie,
         });
       });
 
       watchlistData?.forEach((w: any) => {
-        const movie = Array.isArray(w.movie) ? w.movie[0] : w.movie;
         activities.push({
           id: w.id,
           type: 'watchlist',
           data: { status: w.status },
           created_at: w.added_at,
-          movie: movie,
+          movie: w.movie,
         });
       });
 
@@ -182,7 +174,6 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-black px-4 py-12">
       <div className="max-w-7xl mx-auto">
-        {/* Profile Header */}
         <div className="bg-surface-elevated rounded-xl border border-gray-800 p-8 mb-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="w-24 h-24 rounded-full bg-gold/20 flex items-center justify-center flex-shrink-0">
@@ -231,7 +222,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Activity Feed */}
         <div className="mb-8">
           <h2 className="text-2xl font-serif text-gold mb-6">📝 Recent Activity</h2>
           {activities.length === 0 ? (
@@ -268,7 +258,6 @@ export default function ProfilePage() {
                       {new Date(activity.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  {/* Watch Now button on activities */}
                   <button
                     onClick={handleWatchNow}
                     className="px-3 py-1 bg-gold/20 text-gold text-xs rounded-full hover:bg-gold/40 transition font-medium flex-shrink-0"
@@ -281,7 +270,6 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* My Reviews */}
         {ratings.length > 0 && (
           <div>
             <h2 className="text-2xl font-serif text-gold mb-6">⭐ My Reviews</h2>
@@ -318,7 +306,6 @@ export default function ProfilePage() {
                           </p>
                         )}
                       </div>
-                      {/* Watch Now button on reviews */}
                       <button
                         onClick={handleWatchNow}
                         className="flex-shrink-0 px-3 py-1 bg-gold/20 text-gold text-xs rounded-full hover:bg-gold/40 transition font-medium"
