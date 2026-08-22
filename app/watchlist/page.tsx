@@ -37,11 +37,11 @@ export default function WatchlistPage() {
     }
 
     if (user) {
-      loadWatchlist();
+      loadWatchlist(user.id);
     }
   }, [user, loading]);
 
-  const loadWatchlist = async () => {
+  const loadWatchlist = async (userId: string) => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -59,7 +59,7 @@ export default function WatchlistPage() {
             vote_average
           )
         `)
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('added_at', { ascending: false });
 
       if (error) throw error;
