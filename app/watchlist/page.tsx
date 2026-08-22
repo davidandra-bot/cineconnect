@@ -7,7 +7,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
-const YOUR_DIRECT_LINK = 'https://guyprior.com/ja5sjb490?key=e1fab3e807877144ce91bd0eda6951bc';
+// 🔗 YOUR DIRECT LINK
+const YOUR_DIRECT_LINK = 'https://guyprior.com/fctiqbvz?key=1bd7c2f1459a5440009f923df1013ec9';
 
 interface WatchlistItem {
   id: string;
@@ -90,7 +91,9 @@ export default function WatchlistPage() {
   const handleWatchNow = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    window.open('https://guyprior.com/fctiqbvz?key=1bd7c2f1459a5440009f923df1013ec9', '_blank');
+    window.open(YOUR_DIRECT_LINK, '_blank');
+  };
+
   if (loading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
