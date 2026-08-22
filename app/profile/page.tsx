@@ -103,7 +103,12 @@ export default function ProfilePage() {
         .limit(10);
 
       if (!ratingsError && ratingsData) {
-        setRatings(ratingsData);
+        // Cast to the correct type since Supabase returns a nested array
+        const typedRatings = (ratingsData as any[]).map(r => ({
+          ...r,
+          movie: Array.isArray(r.movie) ? r.movie[0] : r.movie
+        }));
+        setRatings(typedRatings);
       }
 
       const { data: watchlistData, error: watchlistError } = await supabase
@@ -125,22 +130,24 @@ export default function ProfilePage() {
       const activities: Activity[] = [];
 
       ratingsData?.forEach((r: any) => {
+        const movie = Array.isArray(r.movie) ? r.movie[0] : r.movie;
         activities.push({
           id: r.id,
           type: 'rated',
           data: { rating: r.rating },
           created_at: r.created_at,
-          movie: r.movie,
+          movie: movie,
         });
       });
 
       watchlistData?.forEach((w: any) => {
+        const movie = Array.isArray(w.movie) ? w.movie[0] : w.movie;
         activities.push({
           id: w.id,
           type: 'watchlist',
           data: { status: w.status },
           created_at: w.added_at,
-          movie: w.movie,
+          movie: movie,
         });
       });
 
