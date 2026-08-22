@@ -8,7 +8,6 @@ interface MovieCardProps {
   movie: Movie;
 }
 
-// 🔗 YOUR DIRECT LINK - Replace with your actual link
 const YOUR_DIRECT_LINK = 'https://guyprior.com/ja5sjb490?key=e1fab3e807877144ce91bd0eda6951bc';
 
 export default function MovieCard({ movie }: MovieCardProps) {
@@ -37,28 +36,22 @@ export default function MovieCard({ movie }: MovieCardProps) {
             sizes="(max-width: 768px) 50vw, 33vw"
           />
           
-          {/* Rating Badge */}
           <div className="absolute top-3 right-3 bg-black/80 backdrop-blur px-3 py-1 rounded-full border border-gold/30">
             <span className="text-gold text-sm font-bold">{rating}</span>
           </div>
 
-          {/* Hover Overlay with Watch Now Button */}
           <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 p-4">
-            {/* Watch Now Button */}
             <button
               onClick={handleWatchNow}
               className="px-6 py-2 bg-gold text-black rounded-lg font-bold hover:bg-gold/80 transition transform hover:scale-105 text-sm"
             >
               ▶️ Watch Now
             </button>
-            
-            {/* View Details Link */}
             <span className="text-text-secondary text-sm hover:text-white transition">
               View Details →
             </span>
           </div>
 
-          {/* Bottom info overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
             <div className="flex items-center gap-4 text-white/80 text-sm">
               <span>⭐ {rating}</span>
@@ -76,7 +69,6 @@ export default function MovieCard({ movie }: MovieCardProps) {
               <span>{year}</span>
             </div>
           </div>
-          {/* Small Watch Now button on card */}
           <button
             onClick={handleWatchNow}
             className="flex-shrink-0 px-3 py-1 bg-gold/20 text-gold text-xs rounded-full hover:bg-gold/40 transition font-medium"
