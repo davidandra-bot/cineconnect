@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-// Your Adsterra IDs (from your codes)
+// Your Adsterra IDs
 const AD_IDS = {
   popunder1: '606985228f68d2eb3d290b4de5060cb7',
   popunder2: 'f51fe4776b368665400a2f434091fec6',
@@ -12,20 +12,16 @@ const AD_IDS = {
   ad6: 'e1fab3e807877144ce91bd0eda6951bc',
 };
 
-// Popunder Ad (loads in background)
 export function AdPopunder() {
   useEffect(() => {
-    // Load first popunder
     const script1 = document.createElement('script');
     script1.src = `https://guyprior.com/60/69/85/${AD_IDS.popunder1}.js`;
     document.head.appendChild(script1);
 
-    // Load second popunder (background)
     const script2 = document.createElement('script');
     script2.src = `https://guyprior.com/f5/1f/e4/${AD_IDS.popunder2}.js`;
     document.head.appendChild(script2);
 
-    // Exit-intent popunder
     const exitKey = 'adsterra_exit_shown';
     const handleExitIntent = (e: MouseEvent) => {
       if (e.clientY <= 0) {
@@ -47,7 +43,6 @@ export function AdPopunder() {
   return null;
 }
 
-// Native Ad (blended with content)
 export function AdNative() {
   useEffect(() => {
     const script = document.createElement('script');
@@ -71,10 +66,8 @@ export function AdNative() {
   );
 }
 
-// Banner Ad (468x60)
 export function AdBanner() {
   useEffect(() => {
-    // Inject the ad code
     const script = document.createElement('script');
     script.innerHTML = `
       atOptions = {
@@ -100,13 +93,11 @@ export function AdBanner() {
   return (
     <div className="flex justify-center my-4">
       <div className="bg-surface-elevated rounded-lg overflow-hidden min-h-[60px] flex items-center justify-center">
-        {/* Ad loads here */}
       </div>
     </div>
   );
 }
 
-// Sidebar Ad (300x250)
 export function AdSidebar() {
   useEffect(() => {
     const script = document.createElement('script');
@@ -134,16 +125,13 @@ export function AdSidebar() {
   return (
     <div className="sticky top-32">
       <div className="bg-surface-elevated rounded-lg overflow-hidden min-h-[250px] flex items-center justify-center">
-        {/* Ad loads here */}
       </div>
     </div>
   );
 }
 
-// Social Bar (Sticky at bottom)
 export function AdSocial() {
   useEffect(() => {
-    // Use the banner ad code for social bar
     const script = document.createElement('script');
     script.innerHTML = `
       atOptions = {
@@ -170,7 +158,6 @@ export function AdSocial() {
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/95 border-t border-gray-800/50">
       <div className="flex justify-center py-2">
         <div className="bg-surface-elevated rounded-lg overflow-hidden min-h-[60px] flex items-center justify-center">
-          {/* Ad loads here */}
         </div>
       </div>
     </div>
