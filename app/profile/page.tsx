@@ -68,17 +68,17 @@ export default function ProfilePage() {
     }
 
     if (user) {
-      loadProfileData();
+      loadProfileData(user.id);
     }
   }, [user, loading]);
 
-  const loadProfileData = async () => {
+  const loadProfileData = async (userId: string) => {
     setIsLoading(true);
     try {
       const { data: profileData, error: profileError } = await supabase
         .from('users')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
 
       if (profileError) throw profileError;
@@ -98,7 +98,7 @@ export default function ProfilePage() {
             release_date
           )
         `)
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(10);
 
@@ -118,7 +118,7 @@ export default function ProfilePage() {
             poster_path
           )
         `)
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('added_at', { ascending: false })
         .limit(10);
 
