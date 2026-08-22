@@ -4,6 +4,8 @@ import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import SearchBar from '@/components/SearchBar';
+import Notifications from '@/components/Notifications';
 import { AdPopunder, AdSocial, AdBanner } from '@/components/Ads';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -11,9 +13,10 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'CineConnect - Social Movie Community',
   description: 'Connect with movie lovers, share reviews, and discover your next favorite film',
+  manifest: '/manifest.json',
+  themeColor: '#000000',
 };
 
-// Navigation Component
 function Navbar() {
   const { user, signOut } = useAuth();
 
@@ -31,28 +34,27 @@ function Navbar() {
             </span>
           </Link>
 
-          {/* Navigation Links - Desktop */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-text-secondary hover:text-white transition text-sm">
+          {/* Navigation - Desktop */}
+          <div className="hidden md:flex items-center gap-6 flex-1 justify-center">
+            <Link href="/" className="text-text-secondary hover:text-white transition text-sm whitespace-nowrap">
               Home
             </Link>
-            <Link href="/movies" className="text-text-secondary hover:text-white transition text-sm">
+            <Link href="/movies" className="text-text-secondary hover:text-white transition text-sm whitespace-nowrap">
               Movies
             </Link>
-            <Link href="/watchlist" className="text-text-secondary hover:text-white transition text-sm">
+            <Link href="/watchlist" className="text-text-secondary hover:text-white transition text-sm whitespace-nowrap">
               📋 Watchlist
             </Link>
+            <SearchBar />
           </div>
 
           {/* User Menu */}
           <div className="flex items-center gap-4">
+            <Notifications />
             {user ? (
               <>
-                <Link href="/profile" className="text-text-secondary hover:text-white transition">
+                <Link href="/profile" className="text-text-secondary hover:text-white transition hidden md:block">
                   👤 Profile
-                </Link>
-                <Link href="/watchlist" className="text-text-secondary hover:text-white transition relative md:hidden">
-                  📋
                 </Link>
                 <button
                   onClick={signOut}
@@ -115,11 +117,11 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-black text-white antialiased`}>
         <AuthProvider>
-          <AdPopunder />          {/* Popunder ads */}
-          <AdBanner />            {/* Banner ad at top */}
+          <AdPopunder />
+          <AdBanner />
           <Navbar />
-          <main className="pb-20">{children}</main>  {/* Space for social bar */}
-          <AdSocial />            {/* Sticky bottom ad */}
+          <main className="pb-20">{children}</main>
+          <AdSocial />
         </AuthProvider>
       </body>
     </html>
