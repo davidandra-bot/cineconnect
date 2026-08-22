@@ -1,14 +1,5 @@
 'use client';
-// Add this at the top with other imports
-const YOUR_DIRECT_LINK = 'https://guyprior.com/ja5sjb490?key=e1fab3e807877144ce91bd0eda6951bc';
 
-// Replace the "Get Started" button with:
-<button
-  onClick={() => window.open(YOUR_DIRECT_LINK, '_blank')}
-  className="px-8 py-3 bg-gold text-black rounded-lg font-semibold hover:bg-gold/80 transition"
->
-  Get Started
-</button>
 import WatchlistButton from '@/components/WatchlistButton';
 import { useEffect, useState } from 'react';
 import { getMovieDetails, getMovieTrailer } from '@/lib/tmdb';
@@ -293,76 +284,78 @@ export default function MoviePage({ params }: MoviePageProps) {
             </div>
 
             {trailerKey && (
-        <div className="mt-6">
-    <a
-      href={`https://www.youtube.com/watch?v=${trailerKey}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 px-6 py-3 bg-crimson text-white rounded-lg hover:bg-crimson/80 transition"
-    >
-      ▶ Watch Trailer
-    </a>
-  </div>
-)}
-
-{/* Add Watchlist Button */}
-<div className="mt-4">
-  <WatchlistButton movieId={movieId} movieTitle={movie.title} />
-</div>
-
-        {/* User Reviews Section */}
-        <div className="mt-12 pb-12">
-          <h2 className="text-2xl font-serif text-gold mb-6">User Reviews</h2>
-
-          {ratings.length === 0 ? (
-            <p className="text-text-muted">No reviews yet. Be the first to rate!</p>
-          ) : (
-            <div className="space-y-4">
-              {ratings.map((rating) => (
-                <div
-                  key={rating.id}
-                  className="p-4 bg-surface-elevated rounded-xl border border-gray-800"
+              <div className="mt-6">
+                <a
+                  href={`https://www.youtube.com/watch?v=${trailerKey}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-crimson text-white rounded-lg hover:bg-crimson/80 transition"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
-                        {rating.user?.avatar_url ? (
-                          <Image
-                            src={rating.user.avatar_url}
-                            alt={rating.user.username}
-                            width={32}
-                            height={32}
-                            className="rounded-full"
-                          />
-                        ) : (
-                          <span className="text-gold text-sm font-bold">
-                            {rating.user?.username?.[0]?.toUpperCase() || '?'}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-white font-medium">
-                          {rating.user?.username || 'Anonymous'}
-                        </p>
-                        <p className="text-text-muted text-sm">
-                          {new Date(rating.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gold font-bold text-lg">
-                        {rating.rating.toFixed(1)}
-                      </span>
-                      <span className="text-text-muted text-sm">/ 10</span>
-                    </div>
-                  </div>
-                  {rating.review_text && (
-                    <p className="mt-3 text-text-secondary">{rating.review_text}</p>
-                  )}
-                </div>
-              ))}
+                  ▶ Watch Trailer
+                </a>
+              </div>
+            )}
+
+            {/* Add Watchlist Button */}
+            <div className="mt-4">
+              <WatchlistButton movieId={movieId} movieTitle={movie.title} />
             </div>
-          )}
+
+            {/* User Reviews Section */}
+            <div className="mt-12 pb-12">
+              <h2 className="text-2xl font-serif text-gold mb-6">User Reviews</h2>
+
+              {ratings.length === 0 ? (
+                <p className="text-text-muted">No reviews yet. Be the first to rate!</p>
+              ) : (
+                <div className="space-y-4">
+                  {ratings.map((rating) => (
+                    <div
+                      key={rating.id}
+                      className="p-4 bg-surface-elevated rounded-xl border border-gray-800"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
+                            {rating.user?.avatar_url ? (
+                              <Image
+                                src={rating.user.avatar_url}
+                                alt={rating.user.username}
+                                width={32}
+                                height={32}
+                                className="rounded-full"
+                              />
+                            ) : (
+                              <span className="text-gold text-sm font-bold">
+                                {rating.user?.username?.[0]?.toUpperCase() || '?'}
+                              </span>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-white font-medium">
+                              {rating.user?.username || 'Anonymous'}
+                            </p>
+                            <p className="text-text-muted text-sm">
+                              {new Date(rating.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gold font-bold text-lg">
+                            {rating.rating.toFixed(1)}
+                          </span>
+                          <span className="text-text-muted text-sm">/ 10</span>
+                        </div>
+                      </div>
+                      {rating.review_text && (
+                        <p className="mt-3 text-text-secondary">{rating.review_text}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
